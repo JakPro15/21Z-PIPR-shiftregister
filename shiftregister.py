@@ -1,12 +1,12 @@
 class EmptyArgumentsListError(Exception):
     """
-    Raised when boolean_operation_on_list function or one of the logic
-    functions receives an empty list of arguments.
+    Exception raised when boolean_operation_on_list function or one of the
+    logic functions receives an empty list of arguments.
     """
     pass
 
 
-class WrongOperatorStringError(Exception):
+class WrongOperationStringError(Exception):
     """
     Exception raised when bool_operation_str_to_function function receives a
     string which does not represent a valid Boolean operation.
@@ -16,21 +16,21 @@ class WrongOperatorStringError(Exception):
 
 class InvalidStateError(Exception):
     """
-    Raised when attempting to set the state of a Register to a list of
-    different length than the number of flip-flops of the register.
+    Exception raised when attempting to set the state of a Register to a list
+    of different length than the number of flip-flops of the register.
     """
     pass
 
 
-def boolean_operation_on_list(arguments, operation):
+def operation_on_list(arguments, operation):
     """
     Performs the given operation (a function accepting two arguments) on the
-    given list of arguments and returns the result.
+    given list of arguments (going from lower to higher indexes) and returns
+    the result.
     """
     if not arguments:
-        raise EmptyArgumentsListError("Attempted to perform a Boolean "
-                                      "operation on an empty list of "
-                                      "arguments.")
+        raise EmptyArgumentsListError("Attempted to perform an operation on "
+                                      "an empty list of arguments.")
     result = arguments[0]
     first = True
     for argument in arguments:
@@ -46,7 +46,17 @@ def logic_xor(arguments):
     Performs the XOR operation on the given list of Boolean values, returns
     the result.
     """
-    return boolean_operation_on_list(arguments, lambda p, q: p ^ q)
+    if not arguments:
+        raise EmptyArgumentsListError("Attempted to perform an operation on "
+                                      "an empty list of arguments.")
+    one_true = False
+    for argument in arguments:
+        if argument:
+            if not one_true:
+                one_true = True
+            else:
+                return False
+    return one_true
 
 
 def logic_and(arguments):
@@ -54,15 +64,7 @@ def logic_and(arguments):
     Performs the AND operation on the given list of Boolean values, returns
     the result.
     """
-    return boolean_operation_on_list(arguments, lambda p, q: p and q)
-
-
-def logic_nor(arguments):
-    """
-    Performs the NOR operation on the given list of Boolean values, returns
-    the result.
-    """
-    return not boolean_operation_on_list(arguments, lambda p, q: p or q)
+    return operation_on_list(arguments, lambda p, q: p and q)
 
 
 def logic_or(arguments):
@@ -70,35 +72,27 @@ def logic_or(arguments):
     Performs the OR operation on the given list of Boolean values, returns
     the result.
     """
-    return boolean_operation_on_list(arguments, lambda p, q: p or q)
-
-
-def logic_nand(arguments):
-    """
-    Performs the NAND operation on the given list of Boolean values, returns
-    the result.
-    """
-    return not boolean_operation_on_list(arguments, lambda p, q: p and q)
+    return operation_on_list(arguments, lambda p, q: p or q)
 
 
 def bool_operation_str_to_function(function_as_str):
     """
     Converts the given string representing a Boolean operation (xor, and, nor,
     or, nand) to a function. If the string does not represent any of these 5
-    operations, WrongOperatorStringError is raised.
+    operations, WrongOperationStringError is raised.
     """
     if function_as_str == 'xor':
         return logic_xor
     if function_as_str == 'and':
         return logic_and
     if function_as_str == 'nor':
-        return logic_nor
+        return lambda arguments: not logic_or(arguments)
     if function_as_str == 'or':
         return logic_or
     if function_as_str == 'nand':
-        return logic_nand
-    raise WrongOperatorStringError("Attempted to convert an invalid string to "
-                                   "a Boolean operator function")
+        return lambda arguments: not logic_and(arguments)
+    raise WrongOperationStringError("Attempted to convert an invalid string to"
+                                    " a Boolean operator function")
 
 
 class Logic_Function:
