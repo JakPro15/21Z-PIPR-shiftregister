@@ -1,5 +1,6 @@
 import shiftregister
 import pytest
+# import io
 
 
 def test_operation_on_list_addition():
@@ -466,3 +467,18 @@ def test_register_looped_3():
     assert not register.looped()
     register.set_starting_state([False, True, False])
     assert register.looped()
+
+
+def test_convert_to_int_1():
+    assert str(shiftregister.convert_to_int([True, True, False])) == \
+        '[1, 1, 0]'
+
+
+def test_convert_to_int_2():
+    assert str(shiftregister.convert_to_int([0, 1, False, True])) == \
+        '[0, 1, 0, 1]'
+
+
+def test_convert_to_int_empty_list():
+    assert str(shiftregister.convert_to_int([])) == \
+        '[]'
