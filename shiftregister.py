@@ -1,9 +1,16 @@
+import sys
+import argparse
+import json
+
+
 class EmptyArgumentsListError(Exception):
     """
     Exception raised when boolean_operation_on_list function or one of the
     logic functions receives an empty list of arguments.
     """
-    pass
+    def __init__(self):
+        super().__init__("Attempted to perform an operation on an empty list "
+                         "of arguments.")
 
 
 class WrongOperationStringError(Exception):
@@ -29,15 +36,10 @@ def operation_on_list(arguments, operation):
     the result.
     """
     if not arguments:
-        raise EmptyArgumentsListError("Attempted to perform an operation on "
-                                      "an empty list of arguments.")
+        raise EmptyArgumentsListError
     result = arguments[0]
-    first = True
-    for argument in arguments:
-        if first:
-            first = False
-        else:
-            result = operation(result, argument)
+    for argument in arguments[1:]:
+        result = operation(result, argument)
     return result
 
 
@@ -47,8 +49,7 @@ def logic_xor(arguments):
     the result.
     """
     if not arguments:
-        raise EmptyArgumentsListError("Attempted to perform an operation on "
-                                      "an empty list of arguments.")
+        raise EmptyArgumentsListError
     one_true = False
     for argument in arguments:
         if argument:
@@ -103,9 +104,9 @@ class Logic_Function:
     :param _operation: Boolean operation to be performed on the inputs of the
                        function.
     :type _operation: function
-    :param input_indexes: Indexes of the flip-flops outputs of which are taken
-                          as inputs of the logic function.
-    :type input_indexes: list[int]
+    :param _input_indexes: Indexes of the flip-flops outputs of which are taken
+                           as inputs of the logic function.
+    :type _input_indexes: list[int]
     """
     def __init__(self, operation, input_indexes):
         """
@@ -116,22 +117,29 @@ class Logic_Function:
            inputs of the logic function.
         """
         self.set_operation(operation)
-        self.input_indexes = input_indexes.copy()
+        self.set_input_indexes(input_indexes)
 
     def operation(self):
         return self._operation
 
-    def set_operation(self, new_operation_as_str: str):
-        self._operation = bool_operation_str_to_function(new_operation_as_str)
+    def set_operation(self, new_operation):
+        self._operation = bool_operation_str_to_function(new_operation)
+
+    def input_indexes(self):
+        return self._input_indexes.copy()
+
+    def set_input_indexes(self, new_input_indexes):
+        self._input_indexes = new_input_indexes.copy()
 
     def calculate(self, flip_flop_outputs):
         """
         Returns the output of the logic function given the list of flip-flop
         outputs.
         """
+        # @TODO Handle IndexError and TypeError in this function
         function_inputs = [flip_flop_outputs[index]
                            for index
-                           in self.input_indexes]
+                           in self._input_indexes]
         return self._operation(function_inputs)
 
 
@@ -143,18 +151,26 @@ class Register:
     :param _flip_flop_functions: List of logic functions being the inputs of
                                  the register's flip-flops.
     :type _flip_flop_functions: list[Logic_Function]
+    :param _starting_state: List of Boolean values representing the starting
+                            states of the register's flip-flops.
+    :type _starting_state: list[bool]
     :param _state: List of Boolean values representing states of the
                    register's flip-flops.
     :type _state: list[bool]
     """
-    def __init__(self, flip_flop_functions, starting_state):
+    def __init__(self, flip_flop_functions, starting_state=None):
         """
         Creates an object of type Register.
         """
-        pass
+        if starting_state is None:
+            self.set_flip_flop_functions(flip_flop_functions)
+        else:
+            self._flip_flop_functions = flip_flop_functions.copy()
+            self.set_starting_state(starting_state)
+            self.set_state(starting_state)
 
     def flip_flop_functions(self):
-        return self._flip_flop_functions
+        return self._flip_flop_functions.copy()
 
     def set_flip_flop_functions(self, flip_flop_functions):
         """
@@ -162,17 +178,29 @@ class Register:
         given list and resets the state of all flip-flops to False.
         """
         self._flip_flop_functions = flip_flop_functions.copy()
+        self.set_starting_state([False for function in flip_flop_functions])
         self.set_state([False for function in flip_flop_functions])
 
+    def starting_state(self):
+        return self._starting_state.copy()
+
+    def set_starting_state(self, new_starting_state):
+        if len(new_starting_state) != len(self._flip_flop_functions):
+            raise InvalidStateError("Attempted to set the starting state of a "
+                                    "register to a list of a different length "
+                                    "than the flip-flop functions list of the "
+                                    "register")
+        self._starting_state = new_starting_state.copy()
+
     def state(self):
-        return self._state
+        return self._state.copy()
 
     def set_state(self, new_state):
         if len(new_state) != len(self._flip_flop_functions):
             raise InvalidStateError("Attempted to set the state of a register "
                                     "to a list of a different length than the "
                                     "flip-flop functions list of the register")
-        self._state = new_state
+        self._state = new_state.copy()
 
     def advance(self):
         """
@@ -181,3 +209,133 @@ class Register:
         self.set_state([flip_flop_function.calculate(self._state)
                         for flip_flop_function
                         in self._flip_flop_functions])
+
+    def looped(self):
+        """
+        Returns True if the current state of the register is the same as the
+        starting state of the register. Otherwise, returns False.
+        """
+        return self._starting_state == self._state
+
+
+def convert_to_int(list):
+    """
+    Converts each of the given list's contents to type int.
+    """
+    return [int(value) for value in list]
+
+
+def add_new_register_state(list, register):
+    """
+    Advances the given register by one step and appends the resulting state of
+    the register to the given list.
+    """
+    register.advance()
+    list.append(convert_to_int(register.state()))
+
+
+def get_sequence_diversity(sequence):
+    """
+    Returns the number of pairs of neighbouring different bits in the given
+    sequence of Boolean values.
+    """
+    result = 0
+    for bit1, bit2 in zip(sequence[:-1], sequence[1:]):
+        if bit1 ^ bit2:
+            result += 1
+    return result
+
+
+def get_average_sequence_diversity(sequences):
+    """
+    Returns the average number of pairs of neighbouring different bits in the
+    given list of sequences of Boolean values.
+    """
+    return sum([get_sequence_diversity(sequence)
+                for sequence
+                in sequences]) / len(sequences)
+
+
+def load_from_file(file_handle):
+    """
+    Loads register data from the given file, returns object of class Register.
+    """
+    register_data = json.load(file_handle)
+    flip_flop_inputs = [Logic_Function(function_data['operation'],
+                                       function_data['input_indexes'])
+                        for function_data
+                        in register_data['flip_flop_functions']]
+    return Register(flip_flop_inputs, register_data['starting_state'])
+
+
+def save_to_file(file_handle, sequences, space_usage,
+                 average_sequence_diversity):
+    """
+    Writes the given generated register data into the give file.
+    """
+    file_handle.write('{\n')
+    file_handle.write('\t"sequences": [\n')
+    for sequence in sequences[:-1]:
+        file_handle.write(f'\t\t{sequence},\n')
+    file_handle.write(f'\t\t{sequences[-1]}\n')
+    file_handle.write('\t],\n')
+    file_handle.write(f'\t"space_usage": {space_usage},\n')
+    file_handle.write('\t"average_sequence_diversity": '
+                      f'{average_sequence_diversity}\n')
+    file_handle.write('}')
+
+
+def main(arguments):
+    parser = argparse.ArgumentParser(description='Simulates a shift register. '
+                                                 'For more information see '
+                                                 'instruction.txt.')
+    parser.add_argument('source',
+                        help='file from which the program loads register data')
+    end_condition = parser.add_mutually_exclusive_group(required=True)
+    end_condition.add_argument('-s', '--steps', type=int,
+                               help='number of steps the program will advance '
+                                    'the state of the register by')
+    end_condition.add_argument('-l', '--until-looped', action='store_true',
+                               help='with this option the program will '
+                                    'generate sequences until it returns '
+                                    'to the original sequence')
+    parser.add_argument('-sv', '--save',
+                        help='save the generated sequences into the given '
+                             'file')
+    parser.add_argument('-sh', '--show', action='store_true',
+                        help='show the generated sequences in standard output')
+    args = parser.parse_args(arguments[1:])
+
+    with open(args.source, 'r') as source_file:
+        register = load_from_file(source_file)
+
+    sequences = [convert_to_int(register.state())]
+    if args.until_looped:
+        add_new_register_state(sequences, register)
+        while(not register.looped()):
+            add_new_register_state(sequences, register)
+    else:
+        for i in range(0, args.steps):
+            add_new_register_state(sequences, register)
+
+    average_sequence_diversity = get_average_sequence_diversity(sequences)
+    average_sequence_diversity = round(average_sequence_diversity, 4)
+    space_usage = len(sequences) / (2 ** len(register.flip_flop_functions()))
+    space_usage = round(space_usage * 100, 4)
+
+    if args.save:
+        with open(args.save, 'w') as file_handle:
+            save_to_file(file_handle, sequences, space_usage,
+                         average_sequence_diversity)
+
+    if args.show:
+        print('The following sequences have been generated:')
+        for sequence in sequences:
+            print(sequence)
+        print('Average sequence diversity of the generated sequences is '
+              f'{average_sequence_diversity}')
+        print(f'Space usage for this register is {space_usage}%')
+
+
+if __name__ == '__main__':
+    main(sys.argv)
