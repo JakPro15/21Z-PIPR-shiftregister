@@ -1,0 +1,21 @@
+{
+    "flip_flop_functions": [
+        {
+            "operation": "nand",
+            "input_indexes": [2, 3]
+        },
+        {
+            "operation": "or",
+            "input_indexes": [0, 2, 3]
+        },
+        {
+            "operation": "and",
+            "input_indexes": [0, 1]
+        },
+        {
+            "operation": "nor",
+            "input_indexes": [0, 1, 2]
+        }
+    ],
+    "starting_state": [1, 0, 0, 1]
+}

@@ -1,6 +1,7 @@
 import shiftregister
 import pytest
-# import io
+from argparse import Namespace
+from io import StringIO
 
 
 def test_operation_on_list_addition():
@@ -19,12 +20,9 @@ def test_operation_on_list_boolean_implication():
 
 
 def test_operation_on_list_empty_list():
-    try:
+    with pytest.raises(shiftregister.EmptyArgumentsListError):
         shiftregister.operation_on_list([], lambda a, b: a + b)
         raise AssertionError
-    except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
 
 
 def test_logic_xor_2_arguments():
@@ -51,8 +49,8 @@ def test_logic_xor_no_arguments():
         shiftregister.logic_xor([])
         raise AssertionError
     except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
+        assert str(e) == "Attempted to perform the XOR operation on an empty "\
+                         "list of arguments."
 
 
 def test_logic_and_2_arguments():
@@ -79,8 +77,8 @@ def test_logic_and_no_arguments():
         shiftregister.logic_and([])
         raise AssertionError
     except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
+        assert str(e) == "Attempted to perform the AND operation on an empty "\
+                         "list of arguments."
 
 
 def test_logic_or_2_arguments():
@@ -107,8 +105,8 @@ def test_logic_or_no_arguments():
         shiftregister.logic_or([])
         raise AssertionError
     except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
+        assert str(e) == "Attempted to perform the OR operation on an empty "\
+                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_xor():
@@ -149,8 +147,8 @@ def test_bool_operation_str_to_function_nor_no_arguments():
         logic_nor([])
         raise AssertionError
     except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
+        assert str(e) == "Attempted to perform the OR operation on an empty "\
+                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_or():
@@ -186,8 +184,8 @@ def test_bool_operation_str_to_function_nand_no_arguments():
         logic_nand([])
         raise AssertionError
     except shiftregister.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform an operation on an empty list "\
-                         "of arguments."
+        assert str(e) == "Attempted to perform the AND operation on an empty "\
+                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_invalid_input_1():
@@ -469,12 +467,12 @@ def test_register_looped_3():
     assert register.looped()
 
 
-def test_convert_to_int_1():
+def test_convert_to_int_typical_1():
     assert str(shiftregister.convert_to_int([True, True, False])) == \
         '[1, 1, 0]'
 
 
-def test_convert_to_int_2():
+def test_convert_to_int_typical_2():
     assert str(shiftregister.convert_to_int([0, 1, False, True])) == \
         '[0, 1, 0, 1]'
 
@@ -482,3 +480,449 @@ def test_convert_to_int_2():
 def test_convert_to_int_empty_list():
     assert str(shiftregister.convert_to_int([])) == \
         '[]'
+
+
+def test_register_add_new_state_1():
+    list = []
+    function0 = shiftregister.Logic_Function('xor', [1, 2])
+    function1 = shiftregister.Logic_Function('or', [0])
+    function2 = shiftregister.Logic_Function('and', [1])
+
+    register = shiftregister.Register([function0, function1, function2],
+                                      [True, False, False])
+    register.add_new_state(list)
+    assert list == [[False, True, False]]
+
+
+def test_register_add_new_state_2():
+    list = []
+    function0 = shiftregister.Logic_Function('nor', [1, 2, 3, 4])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('and', [0, 1])
+    function3 = shiftregister.Logic_Function('and', [2])
+    function4 = shiftregister.Logic_Function('and', [3])
+
+    register = shiftregister.Register([function0, function1, function2,
+                                       function3, function4])
+    register.add_new_state(list)
+    register.add_new_state(list)
+    register.add_new_state(list)
+    assert list == [[True, False, False, False, False],
+                    [True, True, False, False, False],
+                    [False, True, True, False, False]]
+
+
+def test_register_add_new_state_3():
+    list = []
+    function0 = shiftregister.Logic_Function('and', [3])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('and', [1])
+    function3 = shiftregister.Logic_Function('and', [2])
+
+    register = shiftregister.Register([function0, function1,
+                                       function2, function3],
+                                      [True, False, True, False])
+    register.add_new_state(list)
+    register.add_new_state(list)
+    assert list == [[False, True, False, True],
+                    [True, False, True, False]]
+
+
+def test_get_sequences_steps_1():
+    function0 = shiftregister.Logic_Function('xor', [1, 2])
+    function1 = shiftregister.Logic_Function('or', [0])
+    function2 = shiftregister.Logic_Function('and', [1])
+
+    register = shiftregister.Register([function0, function1, function2],
+                                      [True, False, False])
+
+    arguments = Namespace()
+    arguments.steps = 5
+    arguments.until_looped = False
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [True, False, False],
+        [False, True, False],
+        [True, False, True],
+        [True, True, False],
+        [True, True, True],
+        [False, True, True],
+    ]
+
+
+def test_get_sequences_2():
+    function0 = shiftregister.Logic_Function('and', [3])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('and', [1])
+    function3 = shiftregister.Logic_Function('and', [2])
+
+    register = shiftregister.Register([function0, function1,
+                                       function2, function3],
+                                      [True, False, False, False])
+
+    arguments = Namespace()
+    arguments.steps = 7
+    arguments.until_looped = False
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [True, False, False, False],
+        [False, True, False, False],
+        [False, False, True, False],
+        [False, False, False, True],
+        [True, False, False, False],
+        [False, True, False, False],
+        [False, False, True, False],
+        [False, False, False, True],
+    ]
+
+
+def test_get_sequences_until_looped_1():
+    function0 = shiftregister.Logic_Function('xor', [3, 4])
+    function1 = shiftregister.Logic_Function('xor', [0, 4])
+    function2 = shiftregister.Logic_Function('xor', [0, 1])
+    function3 = shiftregister.Logic_Function('xor', [1, 2])
+    function4 = shiftregister.Logic_Function('and', [0, 1, 2, 3])
+
+    register = shiftregister.Register([function0, function1, function2,
+                                       function3, function4],
+                                      [True, False, False, False, False])
+
+    arguments = Namespace()
+    arguments.until_looped = True
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [True, False, False, False, False],
+        [False, True, True, False, False],
+        [False, False, True, False, False],
+        [False, False, False, True, False],
+        [True, False, False, False, False],
+    ]
+
+
+def test_get_sequences_until_looped_2():
+    function0 = shiftregister.Logic_Function('nor', [1, 2, 3, 4])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('and', [0, 1])
+    function3 = shiftregister.Logic_Function('and', [2])
+    function4 = shiftregister.Logic_Function('and', [3])
+
+    register = shiftregister.Register([function0, function1, function2,
+                                       function3, function4])
+
+    arguments = Namespace()
+    arguments.until_looped = True
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [False, False, False, False, False],
+        [True, False, False, False, False],
+        [True, True, False, False, False],
+        [False, True, True, False, False],
+        [False, False, False, True, False],
+        [False, False, False, False, True],
+        [False, False, False, False, False]
+    ]
+
+
+def test_get_sequences_until_looped_no_return_to_beginning_1():
+    function0 = shiftregister.Logic_Function('and', [1, 3])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('or', [1, 3])
+    function3 = shiftregister.Logic_Function('and', [2])
+
+    register = shiftregister.Register([function0, function1, function2,
+                                       function3],
+                                      [True, False, False, False])
+
+    arguments = Namespace()
+    arguments.until_looped = True
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [True, False, False, False],
+        [False, True, False, False],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+        [False, False, False, True],
+        [False, False, True, False],
+    ]
+
+
+def test_get_sequences_until_looped_no_return_to_beginning_2():
+    function0 = shiftregister.Logic_Function('or', [1, 2])
+    function1 = shiftregister.Logic_Function('and', [0])
+    function2 = shiftregister.Logic_Function('nor', [0, 1])
+
+    register = shiftregister.Register([function0, function1, function2],
+                                      [False, True, True])
+
+    arguments = Namespace()
+    arguments.until_looped = True
+
+    sequences = shiftregister.get_sequences(register, arguments)
+    assert sequences == [
+        [False, True, True],
+        [True, False, False],
+        [False, True, False],
+        [True, False, False],
+        [False, True, False],
+        [True, False, False],
+        [False, True, False],
+        [True, False, False],
+        [False, True, False]
+    ]
+
+
+def test_get_sequence_diversity_typical_1():
+    assert shiftregister.get_sequence_diversity([True, True, False, True]) == 2
+
+
+def test_get_sequence_diversity_typical_2():
+    assert shiftregister.get_sequence_diversity([True, False, False]) == 1
+
+
+def test_get_sequence_diversity_one_element():
+    assert shiftregister.get_sequence_diversity([True]) == 0
+
+
+def test_get_sequence_diversity_all_elements_the_same_1():
+    assert shiftregister.get_sequence_diversity([False, False]) == 0
+
+
+def test_get_sequence_diversity_all_elements_the_same_2():
+    assert shiftregister.get_sequence_diversity([True, True, True,
+                                                 True, True]) == 0
+
+
+def test_get_sequence_diversity_max_diversity():
+    assert shiftregister.get_sequence_diversity([True, False, True,
+                                                 False, True, False]) == 5
+
+
+def test_get_average_sequence_diversity_1():
+    sequences = [
+        [True, False, True, True],
+        [True, False, False, True],
+        [True, False, True, False],
+        [False, True, False, True],
+    ]
+    assert shiftregister.get_average_sequence_diversity(sequences) == \
+        pytest.approx(2.5)
+
+
+def test_get_average_sequence_diversity_2():
+    sequences = [
+        [True, True, False, True],
+        [True, False, False],
+        [True],
+        [False, False],
+        [True, True, True, True, True],
+        [True, False, True, False, True, False]
+    ]
+    assert shiftregister.get_average_sequence_diversity(sequences) == \
+        pytest.approx(1.333, abs=1e-2)
+
+
+def test_get_average_sequence_diversity_3():
+    sequences = [
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True]
+    ]
+    assert shiftregister.get_average_sequence_diversity(sequences) == \
+        pytest.approx(2)
+
+
+def test_get_number_of_unique_sequences_all_the_same():
+    sequences = [
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True],
+        [True, False, True]
+    ]
+    assert shiftregister.get_number_of_unique_sequences(sequences) == 1
+
+
+def test_get_number_of_unique_sequences_all_different():
+    sequences = [
+        [True, False, True, True],
+        [True, False, False, True],
+        [True, False, True, False],
+        [False, True, False, True],
+    ]
+    assert shiftregister.get_number_of_unique_sequences(sequences) == 4
+
+
+def test_get_number_of_unique_sequences_mixed_1():
+    sequences = [
+        [True, False, True, True],
+        [True, False, False, True],
+        [True, False, True, False],
+        [True, False, True, True],
+        [False, True, False, True],
+        [True, False, False, True],
+        [True, True, True, True],
+    ]
+    assert shiftregister.get_number_of_unique_sequences(sequences) == 5
+
+
+def test_get_number_of_unique_sequences_mixed_2():
+    sequences = [
+        [True, False],
+        [True, False],
+        [False, True],
+        [True, False],
+        [True, False],
+        [False, True],
+        [True, False],
+        [True, True]
+    ]
+    assert shiftregister.get_number_of_unique_sequences(sequences) == 3
+
+
+def test_get_space_usage_1():
+    sequences = [
+        [True, False],
+        [True, False],
+        [False, True],
+        [True, False],
+        [True, False],
+        [False, True],
+        [True, False],
+        [True, True]
+    ]
+    assert shiftregister.get_space_usage(sequences) == pytest.approx(75)
+
+
+def test_get_space_usage_2():
+    sequences = [
+        [True, False, True, True],
+        [True, False, False, True],
+        [True, False, True, False],
+        [True, False, True, True],
+        [False, True, False, True],
+        [True, False, False, True],
+        [True, True, True, True],
+    ]
+    assert shiftregister.get_space_usage(sequences) == pytest.approx(31.25)
+
+
+def test_get_space_usage_3():
+    sequences = [
+        [False, False, False, False, False],
+        [True, False, False, False, False],
+        [True, True, False, False, False],
+        [False, True, True, False, False],
+        [False, False, False, True, False],
+        [False, False, False, False, True],
+        [False, False, False, False, False]
+    ]
+    assert shiftregister.get_space_usage(sequences) == pytest.approx(18.75)
+
+
+def test_load_register_from_file_1():
+    register_file = StringIO("""{
+    "flip_flop_functions": [
+        {
+            "operation": "nand",
+            "input_indexes": [2, 3]
+        },
+        {
+            "operation": "or",
+            "input_indexes": [0, 2, 3]
+        },
+        {
+            "operation": "and",
+            "input_indexes": [0, 1]
+        },
+        {
+            "operation": "nor",
+            "input_indexes": [0, 1, 2]
+        }
+    ],
+    "starting_state": [1, 0, 0, 1]
+}""")
+    register = shiftregister.load_register_from_file(register_file)
+
+    assert register.starting_state() == [True, False, False, True]
+    assert register.state() == [True, False, False, True]
+
+    functions = register.flip_flop_functions()
+    assert functions[0].operation()([True, True]) is False
+    assert functions[0].operation()([True, False]) is True
+    assert functions[0].operation()([False, False]) is True
+    assert functions[0].input_indexes() == [2, 3]
+
+    assert functions[1].operation()([True, True]) is True
+    assert functions[1].operation()([True, False]) is True
+    assert functions[1].operation()([False, False]) is False
+    assert functions[1].input_indexes() == [0, 2, 3]
+
+    assert functions[2].operation()([True, True]) is True
+    assert functions[2].operation()([True, False]) is False
+    assert functions[2].operation()([False, False]) is False
+    assert functions[2].input_indexes() == [0, 1]
+
+    assert functions[3].operation()([True, True]) is False
+    assert functions[3].operation()([True, False]) is False
+    assert functions[3].operation()([False, False]) is True
+    assert functions[3].input_indexes() == [0, 1, 2]
+
+
+def test_load_register_from_file_2():
+    register_file = StringIO("""{
+    "flip_flop_functions": [
+        {
+            "operation": "xor",
+            "input_indexes": [1, 2]
+        },
+        {
+            "operation": "or",
+            "input_indexes": [0]
+        },
+        {
+            "operation": "and",
+            "input_indexes": [1]
+        }
+    ],
+    "starting_state": [0, 1, 1]
+}""")
+    register = shiftregister.load_register_from_file(register_file)
+
+    assert register.starting_state() == [False, True, True]
+    assert register.state() == [False, True, True]
+
+    functions = register.flip_flop_functions()
+    assert functions[0].operation()([True, True]) is False
+    assert functions[0].operation()([True, False]) is True
+    assert functions[0].operation()([False, False]) is False
+    assert functions[0].input_indexes() == [1, 2]
+
+    assert functions[1].operation()([True, True]) is True
+    assert functions[1].operation()([True, False]) is True
+    assert functions[1].operation()([False, False]) is False
+    assert functions[1].input_indexes() == [0]
+
+    assert functions[2].operation()([True, True]) is True
+    assert functions[2].operation()([True, False]) is False
+    assert functions[2].operation()([False, False]) is False
+    assert functions[2].input_indexes() == [1]
