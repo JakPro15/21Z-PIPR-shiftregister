@@ -316,13 +316,13 @@ def save_data_to_file(file_handle, sequences, space_usage,
     format.
     """
     file_handle.write('{\n'
-                      '\t"sequences": [\n')
+                      '    "sequences": [\n')
     for sequence in sequences[:-1]:
-        file_handle.write(f'\t\t{sequence},\n')
-    file_handle.write(f'\t\t{sequences[-1]}\n'
-                      '\t],\n'
-                      f'\t"space_usage": {space_usage},\n'
-                      '\t"average_sequence_diversity": '
+        file_handle.write(f'        {sequence},\n')
+    file_handle.write(f'        {sequences[-1]}\n'
+                      '    ],\n'
+                      f'    "space_usage": {space_usage},\n'
+                      '    "average_sequence_diversity": '
                       f'{average_sequence_diversity}\n'
                       '}')
 
@@ -334,9 +334,9 @@ def get_results_string(sequences, space_usage, average_sequence_diversity):
     results = 'The following sequences have been generated:\n'
     for sequence in sequences:
         results += str(sequence) + '\n'
-    results += 'Average sequence diversity of the generated sequences is '\
-               f'{average_sequence_diversity}\n'\
-               f'Space usage for this register is {space_usage}%\n'
+    results += f'Space usage for this register is {space_usage}%\n'\
+               'Average sequence diversity of the generated sequences is '\
+               f'{average_sequence_diversity}\n'
     return results
 
 
