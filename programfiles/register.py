@@ -35,6 +35,9 @@ class Register:
             self.set_state(starting_state)
 
     def flip_flop_functions(self):
+        """
+        Returns a copy of the _flip_flop_functions parameter.
+        """
         return self._flip_flop_functions.copy()
 
     def set_flip_flop_functions(self, flip_flop_functions):
@@ -47,14 +50,17 @@ class Register:
         self.set_state([False for function in flip_flop_functions])
 
     def starting_state(self):
+        """
+        Returns a copy of the starting state of the register.
+        """
         return self._starting_state.copy()
 
     def set_starting_state(self, new_starting_state):
+        """
+        Sets the starting state of the register to the given list.
+        """
         if len(new_starting_state) != len(self._flip_flop_functions):
-            raise InvalidStateError("Attempted to set the starting state of a "
-                                    "register to a list of a different length "
-                                    "than the flip-flop functions list of the "
-                                    "register")
+            raise InvalidStateError
         self._starting_state = new_starting_state.copy()
 
     def state(self):
@@ -65,10 +71,11 @@ class Register:
         return convert_to_int(self._state)
 
     def set_state(self, new_state):
+        """
+        Sets the current state of the register to the given list.
+        """
         if len(new_state) != len(self._flip_flop_functions):
-            raise InvalidStateError("Attempted to set the state of a register "
-                                    "to a list of a different length than the "
-                                    "flip-flop functions list of the register")
+            raise InvalidStateError
         self._state = new_state.copy()
 
     def advance(self):

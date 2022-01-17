@@ -1,3 +1,4 @@
+import pytest
 from ..programfiles import logicfunction
 from ..programfiles import register
 
@@ -26,21 +27,11 @@ def test_register_constructor_setters_getters_1():
     assert register1.starting_state() == [False]
     assert register1.state() == [False]
 
-    try:
+    with pytest.raises(register.InvalidStateError):
         register1.set_starting_state([True, True, True])
-        raise AssertionError
-    except register.InvalidStateError as e:
-        assert str(e) == "Attempted to set the starting state of a register "\
-                         "to a list of a different length than the flip-flop "\
-                         "functions list of the register"
 
-    try:
+    with pytest.raises(register.InvalidStateError):
         register1.set_state([True, False])
-        raise AssertionError
-    except register.InvalidStateError as e:
-        assert str(e) == "Attempted to set the state of a register to a list "\
-                         "of a different length than the flip-flop functions "\
-                         "list of the register"
 
 
 def test_register_constructor_setters_getters_2():

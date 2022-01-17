@@ -21,8 +21,7 @@ def logic_xor(arguments):
     the result.
     """
     if not arguments:
-        raise EmptyArgumentsListError("Attempted to perform the XOR operation"
-                                      " on an empty list of arguments.")
+        raise EmptyArgumentsListError
     one_true = False
     for argument in arguments:
         if argument:
@@ -38,11 +37,7 @@ def logic_and(arguments):
     Performs the AND operation on the given list of Boolean values, returns
     the result.
     """
-    try:
-        return operation_on_list(arguments, lambda p, q: p and q)
-    except EmptyArgumentsListError as e:
-        raise EmptyArgumentsListError("Attempted to perform the AND operation"
-                                      " on an empty list of arguments.") from e
+    return operation_on_list(arguments, lambda p, q: p and q)
 
 
 def logic_or(arguments):
@@ -50,11 +45,7 @@ def logic_or(arguments):
     Performs the OR operation on the given list of Boolean values, returns
     the result.
     """
-    try:
-        return operation_on_list(arguments, lambda p, q: p or q)
-    except EmptyArgumentsListError as e:
-        raise EmptyArgumentsListError("Attempted to perform the OR operation"
-                                      " on an empty list of arguments.") from e
+    return operation_on_list(arguments, lambda p, q: p or q)
 
 
 def bool_operation_str_to_function(function_as_str):
@@ -73,8 +64,7 @@ def bool_operation_str_to_function(function_as_str):
         return logic_or
     if function_as_str == 'nand':
         return lambda arguments: not logic_and(arguments)
-    raise WrongOperationStringError("Attempted to convert an invalid string to"
-                                    " a Boolean operator function")
+    raise WrongOperationStringError
 
 
 class Logic_Function:
@@ -101,15 +91,28 @@ class Logic_Function:
         self.set_input_indexes(input_indexes)
 
     def operation(self):
+        """
+        Returns the _operation parameter.
+        """
         return self._operation
 
     def set_operation(self, new_operation):
+        """
+        Sets the _operation parameter given a string representing the Boolean
+        operation.
+        """
         self._operation = bool_operation_str_to_function(new_operation)
 
     def input_indexes(self):
+        """
+        Returns a copy of the _input_indexes parameter.
+        """
         return self._input_indexes.copy()
 
     def set_input_indexes(self, new_input_indexes):
+        """
+        Sets the _input_indexes parameter to a copy of the given list.
+        """
         self._input_indexes = new_input_indexes.copy()
 
     def calculate(self, flip_flop_outputs):

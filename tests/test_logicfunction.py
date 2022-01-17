@@ -43,12 +43,8 @@ def test_logic_xor_one_argument():
 
 
 def test_logic_xor_no_arguments():
-    try:
+    with pytest.raises(exceptions.EmptyArgumentsListError):
         logicfunction.logic_xor([])
-        raise AssertionError
-    except exceptions.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform the XOR operation on an empty "\
-                         "list of arguments."
 
 
 def test_logic_and_2_arguments():
@@ -71,12 +67,8 @@ def test_logic_and_one_argument():
 
 
 def test_logic_and_no_arguments():
-    try:
+    with pytest.raises(exceptions.EmptyArgumentsListError):
         logicfunction.logic_and([])
-        raise AssertionError
-    except exceptions.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform the AND operation on an empty "\
-                         "list of arguments."
 
 
 def test_logic_or_2_arguments():
@@ -99,12 +91,8 @@ def test_logic_or_one_argument():
 
 
 def test_logic_or_no_arguments():
-    try:
+    with pytest.raises(exceptions.EmptyArgumentsListError):
         logicfunction.logic_or([])
-        raise AssertionError
-    except exceptions.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform the OR operation on an empty "\
-                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_xor():
@@ -141,12 +129,8 @@ def test_bool_operation_str_to_function_nor_one_argument():
 
 def test_bool_operation_str_to_function_nor_no_arguments():
     logic_nor = logicfunction.bool_operation_str_to_function('nor')
-    try:
+    with pytest.raises(exceptions.EmptyArgumentsListError):
         logic_nor([])
-        raise AssertionError
-    except exceptions.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform the OR operation on an empty "\
-                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_or():
@@ -178,30 +162,18 @@ def test_bool_operation_str_to_function_nand_one_argument():
 
 def test_bool_operation_str_to_function_nand_no_arguments():
     logic_nand = logicfunction.bool_operation_str_to_function('nand')
-    try:
+    with pytest.raises(exceptions.EmptyArgumentsListError):
         logic_nand([])
-        raise AssertionError
-    except exceptions.EmptyArgumentsListError as e:
-        assert str(e) == "Attempted to perform the AND operation on an empty "\
-                         "list of arguments."
 
 
 def test_bool_operation_str_to_function_invalid_input_1():
-    try:
+    with pytest.raises(exceptions.WrongOperationStringError):
         logicfunction.bool_operation_str_to_function('u')
-        raise AssertionError
-    except exceptions.WrongOperationStringError as e:
-        assert str(e) == "Attempted to convert an invalid string to a "\
-                         "Boolean operator function"
 
 
 def test_bool_operation_str_to_function_invalid_input_2():
-    try:
+    with pytest.raises(exceptions.WrongOperationStringError):
         logicfunction.bool_operation_str_to_function('xor ')
-        raise AssertionError
-    except exceptions.WrongOperationStringError as e:
-        assert str(e) == "Attempted to convert an invalid string to a "\
-                         "Boolean operator function"
 
 
 def test_logic_function_constructor_setters_getters():

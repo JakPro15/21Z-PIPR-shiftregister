@@ -48,9 +48,13 @@ def get_results_string(sequences, space_usage, average_sequence_diversity):
 
 
 def get_parsed_arguments(arguments):
-    parser = argparse.ArgumentParser(description='Simulates a shift register. '
-                                                 'For more information see '
-                                                 'instruction.txt.')
+    """
+    Parses arguments given to the program using argparse.
+    """
+    parser = argparse.ArgumentParser(
+        description='Simulates a shift register. For more information see '
+                    'documentation.pdf'
+    )
     parser.add_argument('source',
                         help='file from which the program loads register data')
     end_condition = parser.add_mutually_exclusive_group(required=True)
