@@ -123,19 +123,7 @@ def test_get_sequences_until_looped_no_return_to_beginning_1():
         [False, True, False, False],
         [False, False, True, False],
         [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
-        [False, False, False, True],
-        [False, False, True, False],
+        [False, False, True, False]
     ]
 
 
@@ -155,12 +143,7 @@ def test_get_sequences_until_looped_no_return_to_beginning_2():
         [False, True, True],
         [True, False, False],
         [False, True, False],
-        [True, False, False],
-        [False, True, False],
-        [True, False, False],
-        [False, True, False],
-        [True, False, False],
-        [False, True, False]
+        [True, False, False]
     ]
 
 

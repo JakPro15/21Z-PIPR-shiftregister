@@ -10,25 +10,16 @@ def test_register_constructor_setters_getters_1():
     functions = [function0, function1, function2]
     register1 = register.Register(functions)
     assert register1.flip_flop_functions() == functions
-    assert register1.starting_state() == [False, False, False]
     assert register1.state() == [False, False, False]
+    assert register1.past_states() == set()
 
     register1.set_state([False, True, True])
-    assert register1.starting_state() == [False, False, False]
-    assert register1.state() == [False, True, True]
-
-    register1.set_starting_state([True, True, True])
-    assert register1.starting_state() == [True, True, True]
     assert register1.state() == [False, True, True]
 
     register1.set_flip_flop_functions([function2])
     assert len(register1.flip_flop_functions()) == 1
     assert register1.flip_flop_functions()[0] == function2
-    assert register1.starting_state() == [False]
     assert register1.state() == [False]
-
-    with pytest.raises(register.WrongRegisterStateError):
-        register1.set_starting_state([True, True, True])
 
     with pytest.raises(register.WrongRegisterStateError):
         register1.set_state([True, False])
@@ -42,7 +33,6 @@ def test_register_constructor_setters_getters_2():
     state = [True, False, True]
     register1 = register.Register(functions, state)
     assert register1.flip_flop_functions() == [function0, function1, function2]
-    assert register1.starting_state() == [True, False, True]
     assert register1.state() == [True, False, True]
 
     functions.remove(function1)
@@ -51,39 +41,32 @@ def test_register_constructor_setters_getters_2():
     assert register1.flip_flop_functions() == [function0, function1, function2]
 
     state.pop(1)
-    assert register1.starting_state() == [True, False, True]
     assert register1.state() == [True, False, True]
 
-    register1.starting_state().pop(1)
     register1.state().pop(1)
-    assert register1.starting_state() == [True, False, True]
     assert register1.state() == [True, False, True]
 
     register1.set_flip_flop_functions(functions)
-    register1.set_starting_state([True, False])
     register1.set_state(state)
+    assert register1.past_states() == set()
     assert register1.flip_flop_functions() == [function0, function2]
-    assert register1.starting_state() == [True, False]
     assert register1.state() == [True, True]
-
-    with pytest.raises(register.WrongFlipFlopStateError):
-        register1.set_starting_state([False, "True"])
 
     with pytest.raises(register.WrongFlipFlopStateError):
         register1.set_state([0.5, False])
 
 
 def test_register_check_state_elements_valid_states():
-    assert register.Register._check_state_elements([1, 0, 1])
+    assert register.Register._check_state_elements((1, 0, 1))
     assert register.Register._check_state_elements([True, 1, False])
     assert register.Register._check_state_elements([True, True, True, False])
 
 
 def test_register_check_state_elements_invalid_states():
-    assert not register.Register._check_state_elements([1, 0, 2])
-    assert not register.Register._check_state_elements([1.5, 3])
-    assert not register.Register._check_state_elements([1, "0", 1])
-    assert not register.Register._check_state_elements([1, 0, "True"])
+    assert not register.Register._check_state_elements((1, 0, 2))
+    assert not register.Register._check_state_elements((1.5, 3))
+    assert not register.Register._check_state_elements((1, "0", 1))
+    assert not register.Register._check_state_elements((1, 0, "True"))
 
 
 def test_register_advance_1():
@@ -204,7 +187,7 @@ def test_register_looped_1():
                                    function2, function3],
                                   [True, False, True, False])
 
-    assert register1.looped()
+    assert not register1.looped()
     register1.advance()
     assert not register1.looped()
     register1.advance()
@@ -220,11 +203,16 @@ def test_register_looped_2():
 
     register1 = register.Register([function0, function1, function2,
                                    function3, function4])
+
+    register1.set_past_states({
+        (True, False, False, False, False),
+        (False, False, False, False, False)
+    })
     assert register1.looped()
     register1.set_state([True, True, False, True, False])
     assert not register1.looped()
     register1.set_state([True, False, False, False, False])
-    assert not register1.looped()
+    assert register1.looped()
     register1.set_state([True, True, True, True, True])
     assert not register1.looped()
     register1.set_state([False, False, False, False, False])
@@ -238,13 +226,13 @@ def test_register_looped_3():
 
     register1 = register.Register([function0, function1, function2],
                                   [True, False, False])
-    assert register1.looped()
+    assert not register1.looped()
 
-    register1.set_starting_state([False, True, True])
+    register1.set_past_states({(False, True, True)})
     assert not register1.looped()
     register1.set_state([False, True, False])
     assert not register1.looped()
-    register1.set_starting_state([False, True, False])
+    register1.set_past_states({(False, True, False)})
     assert register1.looped()
 
 
@@ -259,7 +247,7 @@ def test_convert_to_int_typical_2():
 
 
 def test_convert_to_int_empty_list():
-    assert str(register.convert_to_int([])) == \
+    assert str(register.convert_to_int(())) == \
         '[]'
 
 

@@ -49,7 +49,7 @@ def get_results_string(sequences, space_usage, average_sequence_diversity):
 
 def get_parsed_arguments(arguments):
     """
-    Parses arguments given to the program using argparse.
+    Parses arguments given to the program using argparse library.
     """
     parser = argparse.ArgumentParser(
         description='Simulates a shift register. For more information see '

@@ -1,11 +1,12 @@
 from .exceptions import WrongRegisterStateError, WrongFlipFlopStateError
 
 
-def convert_to_int(list):
+def convert_to_int(iterable):
     """
-    Converts each of the given list's contents to type int.
+    Converts each of the given iterable's contents to type int. Does not
+    modify the iterable, returns the result as a list.
     """
-    return [int(value) for value in list]
+    return [int(value) for value in iterable]
 
 
 class Register:
@@ -16,12 +17,12 @@ class Register:
     :param _flip_flop_functions: List of logic functions being the inputs of
                                  the register's flip-flops.
     :type _flip_flop_functions: list[Logic_Function]
-    :param _starting_state: List of Boolean values representing the starting
-                            states of the register's flip-flops.
-    :type _starting_state: list[bool]
+    :param _past_states: List of lists of Boolean values representing the
+                         previous states of the register's flip-flops.
+    :type _past_states: set[tuple[bool]]
     :param _state: List of Boolean values representing states of the
                    register's flip-flops.
-    :type _state: list[bool]
+    :type _state: tuple[bool]
     """
     def __init__(self, flip_flop_functions, starting_state=None):
         """
@@ -31,7 +32,7 @@ class Register:
             self.set_flip_flop_functions(flip_flop_functions)
         else:
             self._flip_flop_functions = flip_flop_functions.copy()
-            self.set_starting_state(starting_state)
+            self._past_states = set()
             self.set_state(starting_state)
 
     def flip_flop_functions(self):
@@ -46,7 +47,7 @@ class Register:
         given list and resets the state of all flip-flops to False.
         """
         self._flip_flop_functions = flip_flop_functions.copy()
-        self.set_starting_state([False for function in flip_flop_functions])
+        self.set_past_states(set())
         self.set_state([False for function in flip_flop_functions])
 
     @staticmethod
@@ -58,26 +59,22 @@ class Register:
                 return False
         return True
 
-    def starting_state(self):
+    def past_states(self):
         """
-        Returns a copy of the starting state of the register.
+        Sets the past states of the register to the given set.
         """
-        return self._starting_state.copy()
+        return self._past_states.copy()
 
-    def set_starting_state(self, new_starting_state):
+    def set_past_states(self, new_past_states):
         """
-        Sets the starting state of the register to the given list.
+        Sets the past states of the register to the given set.
         """
-        if len(new_starting_state) != len(self._flip_flop_functions):
-            raise WrongRegisterStateError
-        if not self._check_state_elements(new_starting_state):
-            raise WrongFlipFlopStateError
-        self._starting_state = new_starting_state.copy()
+        self._past_states = new_past_states.copy()
 
     def state(self):
         """
-        Returns the state of the register, with the values converted to type
-        int.
+        Returns the state of the register as a list, with the values converted
+        to type int.
         """
         return convert_to_int(self._state)
 
@@ -89,12 +86,14 @@ class Register:
             raise WrongRegisterStateError
         if not self._check_state_elements(new_state):
             raise WrongFlipFlopStateError
-        self._state = new_state.copy()
+        self._state = tuple(new_state)
 
     def advance(self):
         """
-        Advances the state of the register by one step.
+        Advances the state of the register by one step. The previous state of
+        the register is added to _previous_states.
         """
+        self._past_states.add(self._state)
         self.set_state([flip_flop_function.calculate(self._state)
                         for flip_flop_function
                         in self._flip_flop_functions])
@@ -104,7 +103,7 @@ class Register:
         Returns True if the current state of the register is the same as the
         starting state of the register. Otherwise, returns False.
         """
-        return self._starting_state == self._state
+        return self._state in self._past_states
 
     def add_new_state(self, list):
         """

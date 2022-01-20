@@ -26,7 +26,6 @@ def test_load_register_from_file_1():
 }""")
     register = iofunctions.load_register_from_file(register_file)
 
-    assert register.starting_state() == [True, False, False, True]
     assert register.state() == [True, False, False, True]
 
     functions = register.flip_flop_functions()
@@ -71,7 +70,6 @@ def test_load_register_from_file_2():
 }""")
     register = iofunctions.load_register_from_file(register_file)
 
-    assert register.starting_state() == [False, True, True]
     assert register.state() == [False, True, True]
 
     functions = register.flip_flop_functions()
@@ -111,7 +109,6 @@ def test_load_register_from_file_3():
 }""")
     register = iofunctions.load_register_from_file(register_file)
 
-    assert register.starting_state() == [False, False, False]
     assert register.state() == [False, False, False]
 
     functions = register.flip_flop_functions()
