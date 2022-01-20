@@ -4,7 +4,7 @@ import pytest
 
 
 def test_operation_on_list_addition():
-    assert logicfunction.operation_on_list((1, 2, -4),
+    assert logicfunction.operation_on_list([1, 2, -4],
                                            lambda a, b: a + b) == -1
 
 
@@ -14,13 +14,13 @@ def test_operation_on_list_multiplication():
 
 
 def test_operation_on_list_boolean_implication():
-    assert logicfunction.operation_on_list((True, True, False, True),
+    assert logicfunction.operation_on_list([True, True, False, True],
                                            lambda p, q: (not p) or q) is True
 
 
 def test_operation_on_list_empty_list():
     with pytest.raises(exceptions.EmptyArgumentsListError):
-        logicfunction.operation_on_list((), lambda a, b: a + b)
+        logicfunction.operation_on_list([], lambda a, b: a + b)
 
 
 def test_logic_xor_2_arguments():
