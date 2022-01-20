@@ -1,4 +1,9 @@
-from .exceptions import EmptyArgumentsListError, WrongOperationStringError
+from .exceptions import (
+    EmptyArgumentsListError,
+    InvalidFlipFlopIndexError,
+    TooManyArgumentsError,
+    WrongOperationStringError
+)
 
 
 def operation_on_list(arguments, operation):
@@ -48,6 +53,18 @@ def logic_or(arguments):
     return operation_on_list(arguments, lambda p, q: p or q)
 
 
+def logic_not(arguments):
+    """
+    Performs the NOT operation on a Boolean value, given as a list containing
+    one element, returns the result.
+    """
+    if len(arguments) == 0:
+        raise EmptyArgumentsListError
+    if len(arguments) > 1:
+        raise TooManyArgumentsError
+    return not arguments[0]
+
+
 def bool_operation_str_to_function(function_as_str):
     """
     Converts the given string representing a Boolean operation (xor, and, nor,
@@ -64,7 +81,9 @@ def bool_operation_str_to_function(function_as_str):
         return logic_or
     if function_as_str == 'nand':
         return lambda arguments: not logic_and(arguments)
-    raise WrongOperationStringError
+    if function_as_str == 'not':
+        return logic_not
+    raise WrongOperationStringError(function_as_str)
 
 
 class Logic_Function:
@@ -120,9 +139,12 @@ class Logic_Function:
         Returns the output of the logic function given the list of flip-flop
         outputs.
         """
-        # @TODO Handle IndexError and TypeError in this function
-        # These exceptions signify invalid input in the file
-        function_inputs = [flip_flop_outputs[index]
-                           for index
-                           in self._input_indexes]
+        try:
+            function_inputs = [flip_flop_outputs[index]
+                               for index
+                               in self._input_indexes]
+        except IndexError:
+            raise InvalidFlipFlopIndexError
+        except TypeError:
+            raise InvalidFlipFlopIndexError
         return self._operation(function_inputs)

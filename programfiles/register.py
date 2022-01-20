@@ -1,4 +1,4 @@
-from .exceptions import InvalidStateError
+from .exceptions import WrongRegisterStateError, WrongFlipFlopStateError
 
 
 def convert_to_int(list):
@@ -49,6 +49,15 @@ class Register:
         self.set_starting_state([False for function in flip_flop_functions])
         self.set_state([False for function in flip_flop_functions])
 
+    @staticmethod
+    def _check_state_elements(state):
+        for element in state:
+            if not (isinstance(element, bool) or isinstance(element, int)):
+                return False
+            if element not in {0, 1}:
+                return False
+        return True
+
     def starting_state(self):
         """
         Returns a copy of the starting state of the register.
@@ -60,7 +69,9 @@ class Register:
         Sets the starting state of the register to the given list.
         """
         if len(new_starting_state) != len(self._flip_flop_functions):
-            raise InvalidStateError
+            raise WrongRegisterStateError
+        if not self._check_state_elements(new_starting_state):
+            raise WrongFlipFlopStateError
         self._starting_state = new_starting_state.copy()
 
     def state(self):
@@ -75,7 +86,9 @@ class Register:
         Sets the current state of the register to the given list.
         """
         if len(new_state) != len(self._flip_flop_functions):
-            raise InvalidStateError
+            raise WrongRegisterStateError
+        if not self._check_state_elements(new_state):
+            raise WrongFlipFlopStateError
         self._state = new_state.copy()
 
     def advance(self):

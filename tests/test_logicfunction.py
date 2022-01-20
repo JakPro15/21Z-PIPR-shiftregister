@@ -95,6 +95,25 @@ def test_logic_or_no_arguments():
         logicfunction.logic_or([])
 
 
+def test_logic_not_more_arguments():
+    with pytest.raises(exceptions.TooManyArgumentsError):
+        logicfunction.logic_not([False, False, False]) is False
+    with pytest.raises(exceptions.TooManyArgumentsError):
+        logicfunction.logic_not([False, True, True, False]) is True
+    with pytest.raises(exceptions.TooManyArgumentsError):
+        logicfunction.logic_not([True, False]) is True
+
+
+def test_logic_not_one_argument():
+    assert logicfunction.logic_not([False]) is True
+    assert logicfunction.logic_not([True]) is False
+
+
+def test_logic_not_no_arguments():
+    with pytest.raises(exceptions.EmptyArgumentsListError):
+        logicfunction.logic_not([])
+
+
 def test_bool_operation_str_to_function_xor():
     assert logicfunction.bool_operation_str_to_function('xor') == \
         logicfunction.logic_xor
@@ -166,6 +185,11 @@ def test_bool_operation_str_to_function_nand_no_arguments():
         logic_nand([])
 
 
+def test_bool_operation_str_to_function_not():
+    assert logicfunction.bool_operation_str_to_function('not') == \
+        logicfunction.logic_not
+
+
 def test_bool_operation_str_to_function_invalid_input_1():
     with pytest.raises(exceptions.WrongOperationStringError):
         logicfunction.bool_operation_str_to_function('u')
@@ -208,7 +232,7 @@ def test_logic_function_calculate_1():
     logic_function.set_input_indexes([4])
     assert logic_function.calculate([True, False, True,
                                      False, True, False]) is True
-    with pytest.raises(IndexError):
+    with pytest.raises(exceptions.InvalidFlipFlopIndexError):
         logic_function.calculate([True, False, True])
 
 
@@ -222,5 +246,11 @@ def test_logic_function_calculate_2():
     logic_function.set_input_indexes([4])
     assert logic_function.calculate([True, False, True,
                                      False, True, False]) is False
-    with pytest.raises(IndexError):
+    with pytest.raises(exceptions.InvalidFlipFlopIndexError):
         logic_function.calculate([True, False, True])
+
+
+def test_logic_function_calculate_invalid_index():
+    logic_function = logicfunction.Logic_Function('nand', [2, 0, 2.3])
+    with pytest.raises(exceptions.InvalidFlipFlopIndexError):
+        logic_function.calculate([True, False, True, False])

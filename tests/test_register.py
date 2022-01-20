@@ -27,10 +27,10 @@ def test_register_constructor_setters_getters_1():
     assert register1.starting_state() == [False]
     assert register1.state() == [False]
 
-    with pytest.raises(register.InvalidStateError):
+    with pytest.raises(register.WrongRegisterStateError):
         register1.set_starting_state([True, True, True])
 
-    with pytest.raises(register.InvalidStateError):
+    with pytest.raises(register.WrongRegisterStateError):
         register1.set_state([True, False])
 
 
@@ -65,6 +65,25 @@ def test_register_constructor_setters_getters_2():
     assert register1.flip_flop_functions() == [function0, function2]
     assert register1.starting_state() == [True, False]
     assert register1.state() == [True, True]
+
+    with pytest.raises(register.WrongFlipFlopStateError):
+        register1.set_starting_state([False, "True"])
+
+    with pytest.raises(register.WrongFlipFlopStateError):
+        register1.set_state([0.5, False])
+
+
+def test_register_check_state_elements_valid_states():
+    assert register.Register._check_state_elements([1, 0, 1])
+    assert register.Register._check_state_elements([True, 1, False])
+    assert register.Register._check_state_elements([True, True, True, False])
+
+
+def test_register_check_state_elements_invalid_states():
+    assert not register.Register._check_state_elements([1, 0, 2])
+    assert not register.Register._check_state_elements([1.5, 3])
+    assert not register.Register._check_state_elements([1, "0", 1])
+    assert not register.Register._check_state_elements([1, 0, "True"])
 
 
 def test_register_advance_1():
@@ -148,6 +167,31 @@ def test_register_advance_3():
 
     register1.advance()
     assert register1.state() == [False, False, False, False, False]
+
+
+def test_register_advance_4():
+    function0 = logicfunction.Logic_Function('not', [3])
+    function1 = logicfunction.Logic_Function('and', [0])
+    function2 = logicfunction.Logic_Function('not', [1])
+    function3 = logicfunction.Logic_Function('and', [2])
+
+    register1 = register.Register([function0, function1,
+                                   function2, function3],
+                                  [False, False, False, False])
+
+    assert register1.state() == [False, False, False, False]
+
+    register1.advance()
+    assert register1.state() == [True, False, True, False]
+
+    register1.advance()
+    assert register1.state() == [True, True, True, True]
+
+    register1.advance()
+    assert register1.state() == [False, True, False, True]
+
+    register1.advance()
+    assert register1.state() == [False, False, False, False]
 
 
 def test_register_looped_1():

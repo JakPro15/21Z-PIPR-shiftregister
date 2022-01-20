@@ -6,17 +6,45 @@ class EmptyArgumentsListError(Exception):
     pass
 
 
-class WrongOperationStringError(Exception):
+class TooManyArgumentsError(Exception):
     """
-    Exception raised when bool_operation_str_to_function function receives a
-    string which does not represent a valid Boolean operation.
+    Exception raised when the logic function NOT receives more than one
+    argument.
     """
     pass
 
 
-class InvalidStateError(Exception):
+class WrongOperationStringError(Exception):
+    """
+    Exception raised when bool_operation_str_to_function function receives a
+    string which does not represent a valid Boolean operation. Attributes:
+    :param invalid_string: The invalid string which caused the exception.
+    :type invalid_string: str
+    """
+    def __init__(self, invalid_string):
+        super().__init__(self)
+        self.invalid_string = invalid_string
+
+
+class WrongRegisterStateError(Exception):
     """
     Exception raised when attempting to set the state of a Register to a list
     of different length than the number of flip-flops of the register.
+    """
+    pass
+
+
+class WrongFlipFlopStateError(Exception):
+    """
+    Exception raised when attempting to set the state of a Register to a list
+    containing elements different than Boolean values or integers 0 or 1.
+    """
+    pass
+
+
+class InvalidFlipFlopIndexError(Exception):
+    """
+    Exception raised when attempting to use Logic_Function.calculate when one
+    of its flip-flop indexes does not represent any flip-flop in the register.
     """
     pass
