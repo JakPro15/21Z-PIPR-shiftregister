@@ -9,8 +9,8 @@ from .exceptions import (
 def operation_on_list(arguments, operation):
     """
     Performs the given operation (a function accepting two arguments) on the
-    given iterable of arguments (going from lower to higher indexes) and
-    returns the result.
+    given list of arguments (going from lower to higher indexes) and returns
+    the result.
     """
     if not arguments:
         raise EmptyArgumentsListError
