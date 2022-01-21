@@ -221,6 +221,9 @@ def test_logic_function_constructor_setters_getters():
     assert logic_nand([True, True, True, True, True]) is False
     assert logic_function.input_indexes() == [2, 4]
 
+    with pytest.raises(exceptions.InputIndexesNotAListError):
+        logic_function.set_input_indexes(2)
+
 
 def test_logic_function_calculate_1():
     logic_function = logicfunction.Logic_Function('xor', [2, 4, 5])

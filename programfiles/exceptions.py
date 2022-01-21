@@ -48,3 +48,11 @@ class InvalidFlipFlopIndexError(Exception):
     of its flip-flop indexes does not represent any flip-flop in the register.
     """
     pass
+
+
+class InputIndexesNotAListError(Exception):
+    """
+    Exception raised when attempting to use Logic_Function.calculate when one
+    of its flip-flop indexes does not represent any flip-flop in the register.
+    """
+    pass

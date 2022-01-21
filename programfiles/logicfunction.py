@@ -1,5 +1,6 @@
 from .exceptions import (
     EmptyArgumentsListError,
+    InputIndexesNotAListError,
     InvalidFlipFlopIndexError,
     TooManyArgumentsError,
     WrongOperationStringError
@@ -132,7 +133,10 @@ class Logic_Function:
         """
         Sets the _input_indexes parameter to a copy of the given list.
         """
-        self._input_indexes = new_input_indexes.copy()
+        try:
+            self._input_indexes = new_input_indexes.copy()
+        except AttributeError:
+            raise InputIndexesNotAListError
 
     def calculate(self, flip_flop_outputs):
         """

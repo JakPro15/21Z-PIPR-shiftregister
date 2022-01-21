@@ -92,6 +92,4 @@ def test_attempt_to_calculate_sequences_invalid_flip_flop_index_error():
         register1,
         arguments
     ) == 'main.py: error: (in source) one of the given '\
-         'flip-flop indexes does not represent a valid flip-flop index '\
-         '- all values in input_indexes must be nonnegative integers '\
-         'smaller than the number of flip-flops in the register'
+         'flip-flop indexes does not represent a valid flip-flop index'

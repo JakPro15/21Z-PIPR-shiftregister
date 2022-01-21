@@ -1,8 +1,9 @@
 from .iofunctions import load_register_from_file
 from .resultsfunctions import get_sequences
-import json
+from json.decoder import JSONDecodeError
 from .exceptions import (
     EmptyArgumentsListError,
+    InputIndexesNotAListError,
     InvalidFlipFlopIndexError,
     TooManyArgumentsError,
     WrongFlipFlopStateError,
@@ -17,11 +18,13 @@ def attempt_to_load_register(source):
             register = load_register_from_file(source_file)
     except FileNotFoundError:
         return 'main.py: error: the given source file does not exist'
-    except json.decoder.JSONDecodeError:
+    except JSONDecodeError:
         return f'main.py: error: {source} is not a valid JSON file'
     except KeyError:
         return f'main.py: error: {source} must contain both '\
-               '"flip_flop_functions" list and "starting_state" list'
+               '"flip_flop_functions" list and "starting_state" list. Each '\
+               'element of the flip-flop functions list must contain both '\
+               '"operation" string and "input_indexes" list.'
     except WrongOperationStringError as e:
         return f'main.py: error: (in {source}) {e.invalid_string} is not '\
                'a valid Boolean operation'
@@ -34,6 +37,13 @@ def attempt_to_load_register(source):
         return f'main.py: error: (in {source}) the starting state of the '\
                'register must only contain integers 0 and 1, in order to '\
                'represent valid states of the flip-flops'
+    except InputIndexesNotAListError:
+        return f'main.py: error: (in {source}) input indexes data for a '\
+               'flip-flop should be given as a list'
+    except TypeError:
+        return f'main.py: error: (in {source}) "flip_flop_functions" and '\
+               '"starting_state" should be lists, elements of '\
+               '"flip_flop_functions" list should be dictionaries'
     if not register.flip_flop_functions():
         return f'main.py: error: (in {source}) the register must contain '\
                'at least one flip-flop - flip_flop_functions list cannot be '\
@@ -55,7 +65,5 @@ def attempt_to_calculate_sequences(register, args):
                'index'
     except InvalidFlipFlopIndexError:
         return f'main.py: error: (in {args.source}) one of the given '\
-               'flip-flop indexes does not represent a valid flip-flop index '\
-               '- all values in input_indexes must be nonnegative integers '\
-               'smaller than the number of flip-flops in the register'
+               'flip-flop indexes does not represent a valid flip-flop index'
     return sequences
