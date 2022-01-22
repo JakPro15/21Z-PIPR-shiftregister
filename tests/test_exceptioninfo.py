@@ -1,4 +1,4 @@
-from programfiles.resultsfunctions import get_sequences
+from ..programfiles import resultsfunctions
 from ..programfiles import exceptioninfo
 from ..programfiles import iofunctions
 from io import StringIO
@@ -234,7 +234,7 @@ def test_empty_input_indexes_list():
     arguments = Namespace()
     arguments.until_looped = True
     try:
-        get_sequences(register, arguments)
+        resultsfunctions.get_sequences(register, arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
@@ -263,7 +263,7 @@ def test_input_indexes_list_too_large():
     arguments = Namespace()
     arguments.until_looped = True
     try:
-        get_sequences(register, arguments)
+        resultsfunctions.get_sequences(register, arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
@@ -293,7 +293,7 @@ def test_input_index_not_valid():
     arguments = Namespace()
     arguments.until_looped = True
     try:
-        get_sequences(register, arguments)
+        resultsfunctions.get_sequences(register, arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
