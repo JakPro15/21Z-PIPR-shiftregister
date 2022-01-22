@@ -1,4 +1,8 @@
-from .exceptions import WrongRegisterStateError, WrongFlipFlopStateError
+from .exceptions import (
+    EmptyRegisterError,
+    WrongRegisterStateError,
+    WrongFlipFlopStateError
+)
 from copy import deepcopy
 
 
@@ -28,6 +32,8 @@ class Register:
         """
         Creates an object of type Register.
         """
+        if flip_flop_functions == []:
+            raise EmptyRegisterError
         if starting_state is None:
             self.set_flip_flop_functions(flip_flop_functions)
         else:

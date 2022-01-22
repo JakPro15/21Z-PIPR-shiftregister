@@ -56,3 +56,10 @@ class InputIndexesNotAListError(Exception):
     of its flip-flop indexes does not represent any flip-flop in the register.
     """
     pass
+
+
+class EmptyRegisterError(Exception):
+    """
+    Exception raised when attempting to create a register with no flip-flops.
+    """
+    pass

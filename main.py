@@ -1,30 +1,29 @@
 import sys
 from programfiles.resultsfunctions import (
+    get_sequences,
     get_average_sequence_diversity,
     get_space_usage
 )
 from programfiles.iofunctions import (
+    load_register_from_file,
     save_data_to_file,
     get_parsed_arguments,
     get_results_string
 )
-from programfiles.errorcatchers import (
-    attempt_to_load_register,
-    attempt_to_calculate_sequences
+from programfiles.exceptioninfo import (
+    get_exception_info
 )
 
 
 def main(arguments):
     args = get_parsed_arguments(arguments)
 
-    register = attempt_to_load_register(args.source)
-    if isinstance(register, str):
-        print(register)
-        return
-
-    sequences = attempt_to_calculate_sequences(register, args)
-    if isinstance(sequences, str):
-        print(sequences)
+    try:
+        with open(args.source, 'r') as source_file:
+            register = load_register_from_file(source_file)
+        sequences = get_sequences(register, args)
+    except Exception as exception:
+        print(get_exception_info(exception, args.source))
         return
 
     average_sequence_diversity = round(
