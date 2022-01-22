@@ -3,6 +3,7 @@ from .exceptions import (
     EmptyArgumentsListError,
     InputIndexesNotAListError,
     InvalidFlipFlopIndexError,
+    NegativeStepsNumberError,
     TooManyArgumentsError,
     WrongFlipFlopStateError,
     WrongOperationStringError,
@@ -56,6 +57,8 @@ def get_exception_info(exception, source_file_name):
     elif isinstance(exception, InvalidFlipFlopIndexError):
         info = f'main.py: error: (in {source_file_name}) one of the given '\
                'flip-flop indexes does not represent a valid flip-flop index'
+    elif isinstance(exception, NegativeStepsNumberError):
+        info = 'main.py: error: steps number cannot be negative'
     else:
         info = 'main.py: error: an unknown error has occurred'
     return info

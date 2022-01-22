@@ -1,4 +1,4 @@
-from ..programfiles import resultsfunctions
+from ..programfiles import registermanager
 from ..programfiles import exceptioninfo
 from ..programfiles import iofunctions
 from io import StringIO
@@ -233,8 +233,9 @@ def test_empty_input_indexes_list():
     register = iofunctions.load_register_from_file(file_handle)
     arguments = Namespace()
     arguments.until_looped = True
+    manager = registermanager.Register_Manager(register)
     try:
-        resultsfunctions.get_sequences(register, arguments)
+        manager._get_sequences(arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
@@ -262,8 +263,9 @@ def test_input_indexes_list_too_large():
     register = iofunctions.load_register_from_file(file_handle)
     arguments = Namespace()
     arguments.until_looped = True
+    manager = registermanager.Register_Manager(register)
     try:
-        resultsfunctions.get_sequences(register, arguments)
+        manager._get_sequences(arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
@@ -292,13 +294,43 @@ def test_input_index_not_valid():
     register = iofunctions.load_register_from_file(file_handle)
     arguments = Namespace()
     arguments.until_looped = True
+    manager = registermanager.Register_Manager(register)
     try:
-        resultsfunctions.get_sequences(register, arguments)
+        manager._get_sequences(arguments)
         raise AssertionError
     except Exception as exception:
         assert exceptioninfo.get_exception_info(exception, 'abc') == \
             'main.py: error: (in abc) one of the given flip-flop indexes does'\
             ' not represent a valid flip-flop index'
+
+
+def test_negative_steps_number():
+    file_handle = """{
+    "flip_flop_functions": [
+        {
+            "operation": "and",
+            "input_indexes": [1]
+        },
+        {
+            "operation": "not",
+            "input_indexes": [0]
+        }
+    ],
+    "starting_state": [0, 0]
+}"""
+    file_handle = StringIO(file_handle)
+
+    register = iofunctions.load_register_from_file(file_handle)
+    arguments = Namespace()
+    arguments.until_looped = False
+    arguments.steps = -1
+    manager = registermanager.Register_Manager(register)
+    try:
+        manager._get_sequences(arguments)
+        raise AssertionError
+    except Exception as exception:
+        assert exceptioninfo.get_exception_info(exception, 'abc') == \
+            'main.py: error: steps number cannot be negative'
 
 
 def test_unknown_exception():

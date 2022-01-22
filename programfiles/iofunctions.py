@@ -16,12 +16,15 @@ def load_register_from_file(file_handle):
     return Register(flip_flop_inputs, register_data['starting_state'])
 
 
-def save_data_to_file(file_handle, sequences, space_usage,
-                      average_sequence_diversity):
+def save_data_to_file(file_handle, outputs):
     """
     Writes the given generated register data into the given file in the JSON
     format.
     """
+    sequences = outputs['sequences']
+    space_usage = outputs['space_usage']
+    average_sequence_diversity = outputs['average_sequence_diversity']
+
     file_handle.write('{\n'
                       '    "sequences": [\n')
     for sequence in sequences[:-1]:
@@ -34,10 +37,14 @@ def save_data_to_file(file_handle, sequences, space_usage,
                       '}')
 
 
-def get_results_string(sequences, space_usage, average_sequence_diversity):
+def get_results_string(outputs):
     """
     Returns the given generated register data as a string.
     """
+    sequences = outputs['sequences']
+    space_usage = outputs['space_usage']
+    average_sequence_diversity = outputs['average_sequence_diversity']
+
     results = 'The following sequences have been generated:\n'
     for sequence in sequences:
         results += str(sequence) + '\n'

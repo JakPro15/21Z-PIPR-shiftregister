@@ -148,8 +148,13 @@ def test_save_data_to_file_1():
     space_usage = 35.25
     average_sequence_diversity = 1.155
 
-    iofunctions.save_data_to_file(output_file, sequences, space_usage,
-                                  average_sequence_diversity)
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+
+    iofunctions.save_data_to_file(output_file, outputs)
 
     assert output_file.getvalue() == """{
     "sequences": [
@@ -178,8 +183,13 @@ def test_save_data_to_file_2():
     space_usage = 0.2435
     average_sequence_diversity = 5
 
-    iofunctions.save_data_to_file(output_file, sequences, space_usage,
-                                  average_sequence_diversity)
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+
+    iofunctions.save_data_to_file(output_file, outputs)
 
     assert output_file.getvalue() == """{
     "sequences": [
@@ -203,8 +213,13 @@ def test_save_data_to_file_3():
     space_usage = 12
     average_sequence_diversity = 1.1111
 
-    iofunctions.save_data_to_file(output_file, sequences, space_usage,
-                                  average_sequence_diversity)
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+
+    iofunctions.save_data_to_file(output_file, outputs)
 
     assert output_file.getvalue() == """{
     "sequences": [
@@ -230,8 +245,12 @@ def test_get_results_string_1():
     space_usage = 18.75
     average_sequence_diversity = 1.1667
 
-    assert iofunctions.get_results_string(sequences, space_usage,
-                                          average_sequence_diversity) == \
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+    assert iofunctions.get_results_string(outputs) == \
         """The following sequences have been generated:
 [1, 0, 0, 1]
 [1, 1, 0, 0]
@@ -259,8 +278,12 @@ def test_get_results_string_2():
     space_usage = 35.25
     average_sequence_diversity = 1.155
 
-    assert iofunctions.get_results_string(sequences, space_usage,
-                                          average_sequence_diversity) == \
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+    assert iofunctions.get_results_string(outputs) == \
         """The following sequences have been generated:
 [1, 0, 0, 1]
 [1, 1, 0, 0]
@@ -286,8 +309,12 @@ def test_get_results_string_3():
     space_usage = 12
     average_sequence_diversity = 1.1111
 
-    assert iofunctions.get_results_string(sequences, space_usage,
-                                          average_sequence_diversity) == \
+    outputs = {
+        "sequences": sequences,
+        "average_sequence_diversity": average_sequence_diversity,
+        "space_usage": space_usage
+    }
+    assert iofunctions.get_results_string(outputs) == \
         """The following sequences have been generated:
 [1, 0]
 [1, 1]

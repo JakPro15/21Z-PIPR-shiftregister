@@ -63,3 +63,11 @@ class EmptyRegisterError(Exception):
     Exception raised when attempting to create a register with no flip-flops.
     """
     pass
+
+
+class NegativeStepsNumberError(Exception):
+    """
+    Exception raised when attempting to calculate the outputs from a register
+    when a negative number of steps is given.
+    """
+    pass
