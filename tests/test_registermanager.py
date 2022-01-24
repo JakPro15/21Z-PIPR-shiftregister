@@ -295,7 +295,7 @@ def test_get_space_usage_1():
     register1 = register.Register([function])
     manager = registermanager.Register_Manager(register1)
     manager.outputs['sequences'] = sequences
-    assert manager._get_space_usage() == pytest.approx(75)
+    assert manager._get_space_usage() == pytest.approx(0.75)
 
 
 def test_get_space_usage_2():
@@ -313,7 +313,7 @@ def test_get_space_usage_2():
     register1 = register.Register([function])
     manager = registermanager.Register_Manager(register1)
     manager.outputs['sequences'] = sequences
-    assert manager._get_space_usage() == pytest.approx(31.25)
+    assert manager._get_space_usage() == pytest.approx(0.3125)
 
 
 def test_get_space_usage_3():
@@ -331,7 +331,7 @@ def test_get_space_usage_3():
     register1 = register.Register([function])
     manager = registermanager.Register_Manager(register1)
     manager.outputs['sequences'] = sequences
-    assert manager._get_space_usage() == pytest.approx(18.75)
+    assert manager._get_space_usage() == pytest.approx(0.1875)
 
 
 def test_calculate_outputs_1():
@@ -357,8 +357,8 @@ def test_calculate_outputs_1():
         [False, True, True]
     ]
     assert manager.outputs['average_sequence_diversity'] == \
-        pytest.approx(1.1667)
-    assert manager.outputs['space_usage'] == pytest.approx(75)
+        pytest.approx(1.1667, abs=1e-4)
+    assert manager.outputs['space_usage'] == pytest.approx(0.75)
 
 
 def test_calculate_outputs_2():
@@ -386,7 +386,7 @@ def test_calculate_outputs_2():
         [False, False, False, False, False]
     ]
     assert manager.outputs['average_sequence_diversity'] == pytest.approx(1)
-    assert manager.outputs['space_usage'] == pytest.approx(18.75)
+    assert manager.outputs['space_usage'] == pytest.approx(0.1875)
 
 
 def test_calculate_outputs_3():
@@ -412,4 +412,4 @@ def test_calculate_outputs_3():
         [False, False, True, False]
     ]
     assert manager.outputs['average_sequence_diversity'] == pytest.approx(1.6)
-    assert manager.outputs['space_usage'] == pytest.approx(25)
+    assert manager.outputs['space_usage'] == pytest.approx(0.25)

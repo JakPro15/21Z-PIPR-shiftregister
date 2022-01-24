@@ -145,7 +145,7 @@ def test_save_data_to_file_1():
         [1, 1, 1, 0],
         [1, 1, 1, 0]
     ]
-    space_usage = 35.25
+    space_usage = 0.3525
     average_sequence_diversity = 1.155
 
     outputs = {
@@ -168,7 +168,7 @@ def test_save_data_to_file_1():
         [1, 1, 1, 0],
         [1, 1, 1, 0]
     ],
-    "space_usage": 35.25,
+    "space_usage": 0.3525,
     "average_sequence_diversity": 1.155
 }"""
 
@@ -180,7 +180,7 @@ def test_save_data_to_file_2():
         [1, 0, 0, 1, 1, 0],
         [1, 1, 0, 0, 0, 1]
     ]
-    space_usage = 0.2435
+    space_usage = 0.002435
     average_sequence_diversity = 5
 
     outputs = {
@@ -196,7 +196,7 @@ def test_save_data_to_file_2():
         [1, 0, 0, 1, 1, 0],
         [1, 1, 0, 0, 0, 1]
     ],
-    "space_usage": 0.2435,
+    "space_usage": 0.002435,
     "average_sequence_diversity": 5
 }"""
 
@@ -242,7 +242,7 @@ def test_get_results_string_1():
         [1, 1, 1, 0],
         [1, 1, 1, 0]
     ]
-    space_usage = 18.75
+    space_usage = 0.1875
     average_sequence_diversity = 1.1667
 
     outputs = {
@@ -275,7 +275,7 @@ def test_get_results_string_2():
         [1, 1, 1, 0],
         [1, 1, 1, 0]
     ]
-    space_usage = 35.25
+    space_usage = 0.3525
     average_sequence_diversity = 1.155
 
     outputs = {
@@ -306,7 +306,7 @@ def test_get_results_string_3():
         [0, 0],
         [0, 1]
     ]
-    space_usage = 12
+    space_usage = 0.12
     average_sequence_diversity = 1.1111
 
     outputs = {
@@ -320,7 +320,7 @@ def test_get_results_string_3():
 [1, 1]
 [0, 0]
 [0, 1]
-Space usage for this register is 12%
+Space usage for this register is 12.0%
 Average sequence diversity of the generated sequences is 1.1111
 """
 

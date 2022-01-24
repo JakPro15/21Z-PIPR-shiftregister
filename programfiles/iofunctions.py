@@ -42,8 +42,9 @@ def get_results_string(outputs):
     Returns the given generated register data as a string.
     """
     sequences = outputs['sequences']
-    space_usage = outputs['space_usage']
-    average_sequence_diversity = outputs['average_sequence_diversity']
+    space_usage = round(outputs['space_usage'] * 100, 4)
+    average_sequence_diversity = \
+        round(outputs['average_sequence_diversity'], 4)
 
     results = 'The following sequences have been generated:\n'
     for sequence in sequences:
@@ -60,7 +61,7 @@ def get_parsed_arguments(arguments):
     """
     parser = argparse.ArgumentParser(
         description='Simulates a shift register. For more information see '
-                    'documentation.pdf'
+                    'dokumentacja.pdf'
     )
     parser.add_argument('source',
                         help='file from which the program loads register data')

@@ -13,6 +13,9 @@ from .exceptions import (
 
 
 def get_exception_info(exception, source_file_name):
+    """
+    Returns a string with information about the given exception.
+    """
     if isinstance(exception, FileNotFoundError):
         info = 'main.py: error: the given source file does not exist'
     elif isinstance(exception, JSONDecodeError):

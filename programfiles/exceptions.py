@@ -22,6 +22,9 @@ class WrongOperationStringError(Exception):
     :type invalid_string: str
     """
     def __init__(self, invalid_string):
+        """
+        Creates an object of class WrongOperationStringError.
+        """
         super().__init__(self)
         self.invalid_string = invalid_string
 
